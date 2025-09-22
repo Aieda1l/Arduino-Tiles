@@ -41,7 +41,6 @@ class GameScreen:
         self.pitch_map = self._create_pitch_map()
 
         self.arduino = ArduinoHandler()
-        self.key_map = {pygame.K_1: 0, pygame.K_2: 1, pygame.K_3: 2, pygame.K_4: 3}
 
         self.reset_game_state()
 
@@ -208,8 +207,8 @@ class GameScreen:
         taps = []
         if arduino_taps:
             taps.extend(arduino_taps)
-        if event is not None and event.type == pygame.KEYDOWN and event.key in self.key_map:
-            taps.append(self.key_map[event.key])
+        if event is not None and event.type == pygame.KEYDOWN and event.key in config.KEYBINDS:
+            taps.append(config.KEYBINDS[event.key])
 
         for lane_idx in set(taps):
             self._process_tap(lane_idx, self.game_time)
@@ -309,7 +308,8 @@ class GameScreen:
                 is_held = self.autoplay
                 lanes = [tile.lane] if isinstance(tile.lane, int) else tile.lane
                 for l in lanes:
-                    if l in arduino_held_lanes or (l < 4 and keys_held[pygame.K_1 + l]): is_held = True
+                    if l in arduino_held_lanes or any(keys_held[key] and lane == l for key, lane in config.KEYBINDS.items()):
+                        is_held = True
 
                 if is_held:
                     score_multiplier, new_notes_info = tile.update_hold(self.game_time)

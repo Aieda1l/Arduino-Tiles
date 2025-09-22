@@ -1,8 +1,10 @@
 import os
+import pygame
 
 # Screen dimensions
 SCREEN_WIDTH = 480
 SCREEN_HEIGHT = 800
+ASPECT_RATIO = SCREEN_WIDTH / SCREEN_HEIGHT
 
 # Colors
 BLACK = (0, 0, 0)
@@ -10,8 +12,6 @@ WHITE = (255, 255, 255)
 CYAN = (0, 255, 255)
 LIGHT_BLUE = (173, 216, 230)
 GRAY = (128, 128, 128)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
 PERFECT_COLOR = (0, 255, 0)
 GREAT_COLOR = (255, 255, 0)
 GOOD_COLOR = (255, 165, 0)
@@ -39,8 +39,16 @@ CRAZY_CIRCLE_IMG = os.path.join(IMAGES_DIR, "crazy_circle.png")
 DOT_LIGHT_IMG = os.path.join(IMAGES_DIR, "dot_light.png")
 
 # Arduino settings
-SERIAL_PORT = "COM3"  # Change this to your Arduino's serial port
+SERIAL_PORT = "COM3"  # Default, can be changed in settings
 BAUD_RATE = 9600
+
+# Keybinds (default, can be changed in settings)
+KEYBINDS = {
+    pygame.K_d: 0,  # Lane 0
+    pygame.K_f: 1,  # Lane 1
+    pygame.K_j: 2,  # Lane 2
+    pygame.K_k: 3   # Lane 3
+}
 
 # Tile properties
 BEAT_MAP = {
@@ -56,7 +64,7 @@ SPACE_MAP = {
 # Scoring
 PERFECT_TIMING = 0.05
 GREAT_TIMING = 0.1
-GOOD_TIMING = 0.15
+GOOD_TIMING = 0.2
 HOLD_POINTS_PER_BEAT = 10
 COMBO_MULTIPLIER = 1.1
 
@@ -67,4 +75,5 @@ if __name__ == '__main__':
     print(f"Songs directory: {SONGS_DIR}")
     print(f"Sounds directory: {SOUNDS_DIR}")
     print(f"Arduino Serial Port: {SERIAL_PORT} at {BAUD_RATE} baud")
+    print(f"Keybinds: {KEYBINDS}")
     print("\nThis file can be run to test that the paths and settings are correct.")

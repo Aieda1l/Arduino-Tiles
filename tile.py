@@ -264,7 +264,6 @@ if __name__ == '__main__':
     ]
 
     game_time, tps = 0.0, 4.0
-    key_map = {pygame.K_1: 0, pygame.K_2: 1, pygame.K_3: 2, pygame.K_4: 3}
     particles = []
 
     running = True
@@ -274,8 +273,8 @@ if __name__ == '__main__':
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT: running = False
-            if event.type == pygame.KEYDOWN and event.key in key_map:
-                lane = key_map[event.key]
+            if event.type == pygame.KEYDOWN and event.key in config.KEYBINDS:
+                lane = config.KEYBINDS[event.key]
                 active_tiles = [t for t in tiles if t.state == TileState.ACTIVE and (
                             t.lane == lane or (isinstance(t.lane, tuple) and lane in t.lane))]
                 if active_tiles:
@@ -296,7 +295,10 @@ if __name__ == '__main__':
             if tile.state == TileState.ACTIVE and tile.time < game_time - config.GOOD_TIMING:
                 tile.pass_by()
             if tile.state == TileState.HELD:
-                is_held = isinstance(tile.lane, int) and tile.lane < 4 and keys[pygame.K_1 + tile.lane]
+                is_held = isinstance(tile.lane, int) and any(
+                    keys[key] and lane == tile.lane
+                    for key, lane in config.KEYBINDS.items()
+                )
                 if not is_held:
                     tile.release_hold()
                 else:
