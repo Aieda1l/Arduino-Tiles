@@ -1,0 +1,70 @@
+import os
+
+# Screen dimensions
+SCREEN_WIDTH = 480
+SCREEN_HEIGHT = 800
+
+# Colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+CYAN = (0, 255, 255)
+LIGHT_BLUE = (173, 216, 230)
+GRAY = (128, 128, 128)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+PERFECT_COLOR = (0, 255, 0)
+GREAT_COLOR = (255, 255, 0)
+GOOD_COLOR = (255, 165, 0)
+MISS_COLOR = (255, 0, 0)
+
+# Game settings
+FPS = 60
+STRIKE_LINE_Y = SCREEN_HEIGHT - 200
+TILE_WIDTH = SCREEN_WIDTH // 4
+BEATS_AHEAD = 4
+
+# Paths
+ASSETS_DIR = "assets"
+SONGS_DIR = os.path.join(ASSETS_DIR, "songs")
+SOUNDS_DIR = os.path.join(ASSETS_DIR, "snd")
+FONTS_DIR = os.path.join(ASSETS_DIR, "fonts")
+IMAGES_DIR = os.path.join(ASSETS_DIR, "img")
+
+FONT_PATH = os.path.join(FONTS_DIR, "Futura condensed.ttf")
+SYMBOL_FONT_PATH = os.path.join(FONTS_DIR, "Segoe UI Symbol.ttf")
+
+BACKGROUND_IMG = os.path.join(IMAGES_DIR, "background.png")
+CIRCLE_LIGHT_IMG = os.path.join(IMAGES_DIR, "circle_light.png")
+CRAZY_CIRCLE_IMG = os.path.join(IMAGES_DIR, "crazy_circle.png")
+DOT_LIGHT_IMG = os.path.join(IMAGES_DIR, "dot_light.png")
+
+# Arduino settings
+SERIAL_PORT = "COM3"  # Change this to your Arduino's serial port
+BAUD_RATE = 9600
+
+# Tile properties
+BEAT_MAP = {
+    'H': 8, 'I': 4, 'J': 2, 'K': 1, 'L': 0.5, 'M': 0.25,
+    'N': 0.125, 'O': 0.0625, 'P': 0.03125
+}
+
+SPACE_MAP = {
+    'Q': 8, 'R': 4, 'S': 2, 'T': 1, 'U': 0.5, 'V': 0.25,
+    'W': 0.125, 'X': 0.0625, 'Y': 0.03125
+}
+
+# Scoring
+PERFECT_TIMING = 0.05
+GREAT_TIMING = 0.1
+GOOD_TIMING = 0.15
+HOLD_POINTS_PER_BEAT = 10
+COMBO_MULTIPLIER = 1.1
+
+if __name__ == '__main__':
+    print("--- Configuration File ---")
+    print(f"Screen dimensions: {SCREEN_WIDTH}x{SCREEN_HEIGHT}")
+    print(f"Assets directory: {ASSETS_DIR}")
+    print(f"Songs directory: {SONGS_DIR}")
+    print(f"Sounds directory: {SOUNDS_DIR}")
+    print(f"Arduino Serial Port: {SERIAL_PORT} at {BAUD_RATE} baud")
+    print("\nThis file can be run to test that the paths and settings are correct.")
