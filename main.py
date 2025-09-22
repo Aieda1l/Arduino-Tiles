@@ -12,7 +12,7 @@ class GameApp:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
-        pygame.display.set_caption("Piano Tiles 2")
+        pygame.display.set_caption(config.GAME_NAME)
         self.clock = pygame.time.Clock()
         self.arduino = ArduinoHandler()
         self.state = 'loading'

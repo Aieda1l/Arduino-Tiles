@@ -62,7 +62,7 @@ class TitleScreen:
         """Draw the title screen."""
         self.surface.blit(self.background, (0, 0))
         utils.draw_text(
-            self.surface, "Piano Tiles 2", 80,
+            self.surface, config.GAME_NAME, 80,
             config.SCREEN_WIDTH // 2, config.SCREEN_HEIGHT // 4,
             config.WHITE, self.font_path, "center", shadow=True
         )

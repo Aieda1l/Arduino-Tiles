@@ -383,7 +383,7 @@ class MainMenuScreen:
 
         # Draw title
         utils.draw_text(
-            self.surface, "Piano Tiles 2", 60,
+            self.surface, config.GAME_NAME, 60,
             config.SCREEN_WIDTH // 2, 30,
             config.WHITE, self.font_path, "center", shadow=True
         )

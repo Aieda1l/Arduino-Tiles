@@ -18,6 +18,7 @@ GOOD_COLOR = (255, 165, 0)
 MISS_COLOR = (255, 0, 0)
 
 # Game settings
+GAME_NAME = "Arduino Tiles"
 FPS = 60
 STRIKE_LINE_Y = SCREEN_HEIGHT - 200
 TILE_WIDTH = SCREEN_WIDTH // 4
