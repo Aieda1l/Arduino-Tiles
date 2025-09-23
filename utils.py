@@ -48,6 +48,27 @@ def draw_text(surface, text, size, x, y, color, font_path, align="center", shado
     surface.blit(text_surface, text_rect)
     return text_rect
 
+
+# Add this to your existing utils.py
+
+def draw_text_surface(text, size, x, y, color, font_path, align="center", shadow=False):
+    """Render text to a surface and return it with the correct positioning."""
+    font = pygame.font.Font(font_path, size)
+    # Handle alpha channel in color if present
+    render_color = color[:3] if len(color) == 4 else color
+    text_surface = font.render(text, True, render_color)
+
+    if shadow:
+        shadow_surface = font.render(text, True, (0, 0, 0))
+        temp_surface = pygame.Surface((text_surface.get_width() + 2, text_surface.get_height() + 2), pygame.SRCALPHA)
+        temp_surface.blit(shadow_surface, (2, 2))
+        temp_surface.blit(text_surface, (0, 0))
+        text_surface = temp_surface
+
+    # Set the position based on align parameter
+    rect = text_surface.get_rect(**{align: (x, y)})
+    return text_surface
+
 def draw_rounded_rect(surface, rect, color, corner_radius):
     """Draws a rectangle with rounded corners."""
     # Draw the main body

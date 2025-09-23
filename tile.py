@@ -1,6 +1,7 @@
 import pygame
 from enum import Enum, auto
 import random
+import math
 import config
 import utils
 
@@ -74,7 +75,14 @@ class Tile:
 
         # Flash properties for missed tiles
         self.flash_start_time = -1
-        self.FLASH_DURATION = 0.3  # Duration of red flash in seconds
+        self.FLASH_DURATION = 0.3  # Total duration of flash animation in seconds
+        self.FLASH_COUNT = 2  # Number of flashes
+        self.flash_alpha = 0  # Current alpha for flash overlay
+
+        self.circle_light_img = None
+        self.crazy_circle_img = None
+        self.dot_light_img = None
+        self.assets_loaded = False
 
         if not hasattr(Tile, 'assets_loaded'):
             Tile.circle_light_img = utils.load_image(config.CIRCLE_LIGHT_IMG)
@@ -106,7 +114,12 @@ class Tile:
                 if flash_elapsed >= self.FLASH_DURATION:
                     self.state = TileState.ACTIVE  # Revert to active after flash
                     self.flash_start_time = -1
-                    self.hit_quality_color = None
+                    self.flash_alpha = 0
+                else:
+                    # Calculate flash alpha using a sine wave for pulsing effect
+                    flash_progress = flash_elapsed / self.FLASH_DURATION
+                    flash_frequency = self.FLASH_COUNT * 2 * math.pi  # Complete cycles for flashes
+                    self.flash_alpha = 128 * (1 + math.sin(flash_frequency * flash_progress))  # 0-255 range
 
         if self.crazy_circle_anim_start_time > 0:
             anim_elapsed = current_time - self.crazy_circle_anim_start_time
@@ -123,7 +136,7 @@ class Tile:
             draw_rect = self.rect.copy()
             draw_rect.x = lane * config.TILE_WIDTH
             color = config.BLACK
-            if self.state in [TileState.HIT, TileState.MISSED] and self.hit_quality_color:
+            if self.state == TileState.HIT and self.hit_quality_color:
                 color = self.hit_quality_color
 
             temp_surface = pygame.Surface(draw_rect.size, pygame.SRCALPHA)
@@ -138,6 +151,12 @@ class Tile:
 
             if self.state == TileState.HELD:
                 self.draw_curved_fill(temp_surface, draw_rect.size)
+
+            # Draw translucent red overlay for MISSED state
+            if self.state == TileState.MISSED and self.flash_alpha > 0:
+                overlay_surface = pygame.Surface(draw_rect.size, pygame.SRCALPHA)
+                overlay_surface.fill((255, 0, 0, int(self.flash_alpha)))
+                temp_surface.blit(overlay_surface, (0, 0))
 
             temp_surface.set_alpha(self.fade_alpha)
             surface.blit(temp_surface, draw_rect.topleft)
@@ -225,8 +244,8 @@ class Tile:
 
     def miss(self, hit_time):
         self.state = TileState.MISSED
-        self.hit_quality_color = config.MISS_COLOR
         self.flash_start_time = hit_time
+        self.flash_alpha = 128  # Initial alpha for flash overlay
 
     def pass_by(self):
         self.state = TileState.PASSED

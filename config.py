@@ -15,7 +15,7 @@ GRAY = (128, 128, 128)
 PERFECT_COLOR = (0, 255, 0)
 GREAT_COLOR = (255, 255, 0)
 GOOD_COLOR = (255, 165, 0)
-MISS_COLOR = (255, 0, 0, 100)
+MISS_COLOR = (255, 0, 0)
 
 # Game settings
 GAME_NAME = "Arduino Tiles"
