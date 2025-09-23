@@ -19,7 +19,7 @@ class GameApp:
         self.loading_screen = LoadingScreen(self.screen)
         self.title_screen = TitleScreen(self.screen)
         self.menu_screen = None
-        self.game_screen = GameScreen(self.screen)
+        self.game_screen = GameScreen(self.screen, self.arduino)  # Pass initial ArduinoHandler
         self.settings_screen = SettingsScreen(self.screen, self.arduino)
 
     def run(self):
@@ -62,12 +62,11 @@ class GameApp:
                     if result['action'] == 'quit':
                         running = False
                     elif result['action'] == 'back':
+                        # Update GameScreen with new ArduinoHandler and keybinds
+                        self.arduino = result.get('arduino_handler', self.arduino)
+                        self.game_screen.update_arduino_handler(self.arduino)
+                        self.game_screen.update_keybinds(result.get('keybinds', config.KEYBINDS))
                         self.state = 'title'
-                        config.KEYBINDS.update(self.settings_screen.keybinds)
-                        if config.SERIAL_PORT != self.settings_screen.com_port_text:
-                            config.SERIAL_PORT = self.settings_screen.com_port_text
-                            self.arduino.close()
-                            self.arduino = ArduinoHandler(port=config.SERIAL_PORT)
 
         self.arduino.close()
         pygame.quit()

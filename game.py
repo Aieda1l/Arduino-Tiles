@@ -34,15 +34,25 @@ class GameState(Enum):
 
 
 class GameScreen:
-    def __init__(self, surface):
+    def __init__(self, surface, arduino_handler=None):
         self.surface = surface
         self.assets = self.load_assets()
         self.sounds = self.load_sounds()
         self.pitch_map = self._create_pitch_map()
-
-        self.arduino = ArduinoHandler()
-
+        self.arduino = arduino_handler if arduino_handler else ArduinoHandler()  # Use provided handler or create new
         self.reset_game_state()
+
+    def update_arduino_handler(self, arduino_handler):
+        """Update the ArduinoHandler instance."""
+        if self.arduino:
+            self.arduino.close()  # Close the existing connection
+        self.arduino = arduino_handler
+        print("GameScreen ArduinoHandler updated.")
+
+    def update_keybinds(self, keybinds):
+        """Update keybinds from SettingsScreen."""
+        config.KEYBINDS = keybinds
+        print("GameScreen keybinds updated.")
 
     def reset_game_state(self):
         self.game_state = GameState.COUNTDOWN
@@ -52,22 +62,16 @@ class GameScreen:
         self.particles = []
         self.floating_texts = []
         self.tps = 4.0
-
         self.score = 0
         self.combo = 0
         self.stars_earned = 0
-
         self.game_time = 0.0
         self.time_offset = 0.0
         self.countdown_timer = 3.99
-
         self.last_hit_musical_time = 0.0
-
         self.last_pitch = 60
         self.last_lane = -1
-
         self.autoplay = False
-
         self.star_end_times = []
         self.num_stars = 0
 

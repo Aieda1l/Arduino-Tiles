@@ -40,7 +40,7 @@ CRAZY_CIRCLE_IMG = os.path.join(IMAGES_DIR, "crazy_circle.png")
 DOT_LIGHT_IMG = os.path.join(IMAGES_DIR, "dot_light.png")
 
 # Arduino settings
-SERIAL_PORT = "COM3"  # Default, can be changed in settings
+SERIAL_PORT = "COM4"  # Default, can be changed in settings
 BAUD_RATE = 9600
 
 # Keybinds (default, can be changed in settings)

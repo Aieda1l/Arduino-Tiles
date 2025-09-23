@@ -31,7 +31,7 @@ class SettingsScreen:
         spacing = 10
         self.buttons = []
         # Keybind buttons
-        for i in range(4):  # Lanes 0-3
+        for i in range(4):
             lane = f"lane_{i}"
             def set_keybind(l=lane):
                 self.keybind_input = l
@@ -50,6 +50,7 @@ class SettingsScreen:
         # Rescan Arduino button
         def rescan_arduino():
             self.arduino_handler.close()
+            config.SERIAL_PORT = self.com_port_text  # Update config.SERIAL_PORT
             self.arduino_handler = ArduinoHandler(port=self.com_port_text)
             self.feedback_message = "Arduino rescanned." if self.arduino_handler.connected else "Arduino not found."
             self.feedback_timer = 3.0
@@ -60,20 +61,19 @@ class SettingsScreen:
         # Back button
         self.buttons.append(utils.Button(
             (config.SCREEN_WIDTH - 120, config.SCREEN_HEIGHT - 80, 100, 50),
-            "Back", lambda: {'action': 'back'}
+            "Back", lambda: {'action': 'back', 'arduino_handler': self.arduino_handler, 'keybinds': self.keybinds}
         ))
 
     def handle_events(self):
         """Handle user input events."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                return {'action': 'quit'}
+                return {'action': 'quit', 'arduino_handler': self.arduino_handler, 'keybinds': self.keybinds}
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 for button in self.buttons:
                     result = button.handle_event(event)
                     if result:
                         return result
-
                 com_rect = pygame.Rect(50, 400, config.SCREEN_WIDTH - 100, 40)
                 if com_rect.collidepoint(event.pos):
                     self.com_port_active = True
@@ -82,7 +82,7 @@ class SettingsScreen:
                     self.com_port_active = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    return {'action': 'back'}
+                    return {'action': 'back', 'arduino_handler': self.arduino_handler, 'keybinds': self.keybinds}
                 if self.keybind_input:
                     lane_idx = int(self.keybind_input[-1])
                     self.keybinds = {k: v for k, v in self.keybinds.items() if v != lane_idx}
@@ -95,6 +95,11 @@ class SettingsScreen:
                     if event.key == pygame.K_BACKSPACE:
                         self.com_port_text = self.com_port_text[:-1]
                     elif event.key == pygame.K_RETURN:
+                        config.SERIAL_PORT = self.com_port_text  # Update config.SERIAL_PORT on Enter
+                        self.arduino_handler.close()
+                        self.arduino_handler = ArduinoHandler(port=self.com_port_text)
+                        self.feedback_message = "COM port updated." if self.arduino_handler.connected else "Arduino not found."
+                        self.feedback_timer = 3.0
                         self.com_port_active = False
                     else:
                         char = event.unicode
@@ -139,7 +144,6 @@ class SettingsScreen:
             config.SCREEN_WIDTH // 2, 50,
             config.WHITE, self.font_path, "center", shadow=True
         )
-        # Draw COM port input field
         com_rect = pygame.Rect(50, 400, config.SCREEN_WIDTH - 100, 40)
         utils.draw_rounded_rect(self.surface, com_rect, config.LIGHT_BLUE if self.com_port_active else config.GRAY, 10)
         com_text = self.com_port_text if self.com_port_text else ("Enter COM port..." if not self.com_port_active else "")
@@ -149,14 +153,12 @@ class SettingsScreen:
             config.WHITE if self.com_port_text else (180, 180, 180) if not self.com_port_active else config.WHITE,
             self.font_path, "midleft"
         )
-        # Draw feedback message
         if self.feedback_message:
             utils.draw_text(
                 self.surface, self.feedback_message, 24,
                 config.SCREEN_WIDTH // 2, config.SCREEN_HEIGHT - 120,
                 config.CYAN, self.font_path, "center", shadow=True
             )
-        # Draw buttons
         for button in self.buttons:
             button.draw(self.surface)
         pygame.display.flip()
@@ -171,25 +173,4 @@ class SettingsScreen:
                 return result
             self.update(dt)
             self.draw()
-        return {'action': 'quit'}
-
-if __name__ == '__main__':
-    import platform
-    import asyncio
-
-    pygame.init()
-    screen = pygame.display.set_mode((config.SCREEN_WIDTH, config.SCREEN_HEIGHT))
-    pygame.display.set_caption("Settings Screen Test")
-    clock = pygame.time.Clock()
-    arduino = ArduinoHandler()
-    settings = SettingsScreen(screen, arduino)
-
-    async def main():
-        result = settings.run(clock)
-        print(f"Action: {result}")
-        pygame.quit()
-
-    if platform.system() == "Emscripten":
-        asyncio.ensure_future(main())
-    else:
-        asyncio.run(main())
+        return {'action': 'quit', 'arduino_handler': self.arduino_handler, 'keybinds': self.keybinds}
