@@ -1,3 +1,4 @@
+# tile.py
 import pygame
 from enum import Enum, auto
 import random
@@ -91,7 +92,8 @@ class Tile:
             Tile.assets_loaded = True
 
     def update(self, current_time, tps):
-        if self.state in [TileState.ACTIVE, TileState.HELD, TileState.PASSED]:
+        # CHANGED: Added TileState.MISSED to this list so missed tiles continue to scroll.
+        if self.state in [TileState.ACTIVE, TileState.HELD, TileState.PASSED, TileState.MISSED]:
             scroll_speed = tps * config.TILE_WIDTH * 1.5
             time_diff = self.time - current_time
 
@@ -112,7 +114,8 @@ class Tile:
             if self.flash_start_time > 0:
                 flash_elapsed = current_time - self.flash_start_time
                 if flash_elapsed >= self.FLASH_DURATION:
-                    self.state = TileState.ACTIVE  # Revert to active after flash
+                    # CHANGED: Revert to PASSED instead of ACTIVE. A missed tile is gone.
+                    self.state = TileState.PASSED
                     self.flash_start_time = -1
                     self.flash_alpha = 0
                 else:
@@ -141,7 +144,7 @@ class Tile:
 
             temp_surface = pygame.Surface(draw_rect.size, pygame.SRCALPHA)
 
-            if self.type == TileType.LongNote and self.state not in [TileState.HIT, TileState.MISSED]:
+            if self.type == TileType.LongNote and self.state not in [TileState.HIT]: # Removed MISSED check for gradient
                 self.draw_long_note_gradient(temp_surface, draw_rect.size)
                 line_end_y = draw_rect.height - (Tile.circle_light_img.get_height() / 2)
                 pygame.draw.line(temp_surface, config.GRAY, (draw_rect.width / 2, 0), (draw_rect.width / 2, line_end_y),
@@ -161,7 +164,7 @@ class Tile:
             temp_surface.set_alpha(self.fade_alpha)
             surface.blit(temp_surface, draw_rect.topleft)
 
-            if self.type == TileType.LongNote and self.state not in [TileState.HIT, TileState.MISSED]:
+            if self.type == TileType.LongNote and self.state not in [TileState.HIT, TileState.PASSED]: # Removed MISSED
                 circle_pos = (draw_rect.centerx, draw_rect.bottom - Tile.circle_light_img.get_height() / 2)
                 surface.blit(Tile.circle_light_img, Tile.circle_light_img.get_rect(center=circle_pos))
 
@@ -231,7 +234,11 @@ class Tile:
 
     def on_hit(self, quality, color, hit_time):
         self.hit_quality_color = color
-        if quality in ['perfect', 'great']:
+
+        if quality in ['perfect', 'great', 'good']:
+            self.flash_start_time = -1
+            self.flash_alpha = 0
+
             if self.type == TileType.LongNote:
                 self.state = TileState.HELD
                 self.is_being_held = True
@@ -243,9 +250,10 @@ class Tile:
             self.miss(hit_time)
 
     def miss(self, hit_time):
-        self.state = TileState.MISSED
-        self.flash_start_time = hit_time
-        self.flash_alpha = 128  # Initial alpha for flash overlay
+        if self.state != TileState.MISSED:
+            self.state = TileState.MISSED
+            self.flash_start_time = hit_time
+            self.flash_alpha = 128  # Initial alpha for flash overlay
 
     def pass_by(self):
         self.state = TileState.PASSED
@@ -314,14 +322,18 @@ if __name__ == '__main__':
                 if active_tiles:
                     best_tile = min(active_tiles, key=lambda t: abs(t.rect.bottom - config.STRIKE_LINE_Y))
                     quality, color = best_tile.check_hit(game_time)
-                    best_tile.on_hit(quality, color, game_time)
-                    print(f"Lane {lane + 1} Hit: {best_tile.notes} -> {quality.upper()}")
-                    if quality in ['perfect', 'great']:
-                        lanes_to_spawn = [best_tile.lane] if isinstance(best_tile.lane, int) else best_tile.lane
-                        for lane_index in lanes_to_spawn:
-                            for _ in range(10):
-                                particles.append(Particle(lane_index * config.TILE_WIDTH + config.TILE_WIDTH / 2,
-                                                          config.STRIKE_LINE_Y, Tile.dot_light_img))
+                    if quality == 'miss':
+                        best_tile.miss(game_time)
+                        print(f"Lane {lane + 1} Missed: {best_tile.notes}")
+                    else:
+                        best_tile.on_hit(quality, color, game_time)
+                        print(f"Lane {lane + 1} Hit: {best_tile.notes} -> {quality.upper()}")
+                        if quality in ['perfect', 'great']:
+                            lanes_to_spawn = [best_tile.lane] if isinstance(best_tile.lane, int) else best_tile.lane
+                            for lane_index in lanes_to_spawn:
+                                for _ in range(10):
+                                    particles.append(Particle(lane_index * config.TILE_WIDTH + config.TILE_WIDTH / 2,
+                                                              config.STRIKE_LINE_Y, Tile.dot_light_img))
 
         keys = pygame.key.get_pressed()
         for tile in tiles:

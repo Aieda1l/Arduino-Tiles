@@ -1,5 +1,17 @@
 import os
 import pygame
+import sys
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        # When not running as a bundled exe, the base path is the script's directory
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 # Screen dimensions
 SCREEN_WIDTH = 480
@@ -25,7 +37,7 @@ TILE_WIDTH = SCREEN_WIDTH // 4
 BEATS_AHEAD = 4
 
 # Paths
-ASSETS_DIR = "assets"
+ASSETS_DIR = resource_path('assets')
 SONGS_DIR = os.path.join(ASSETS_DIR, "songs")
 SOUNDS_DIR = os.path.join(ASSETS_DIR, "snd")
 FONTS_DIR = os.path.join(ASSETS_DIR, "fonts")
@@ -65,16 +77,6 @@ SPACE_MAP = {
 # Scoring
 PERFECT_TIMING = 0.1
 GREAT_TIMING = 0.15
-GOOD_TIMING = 0.3
+GOOD_TIMING = 0.2
 HOLD_POINTS_PER_BEAT = 10
 COMBO_MULTIPLIER = 1.1
-
-if __name__ == '__main__':
-    print("--- Configuration File ---")
-    print(f"Screen dimensions: {SCREEN_WIDTH}x{SCREEN_HEIGHT}")
-    print(f"Assets directory: {ASSETS_DIR}")
-    print(f"Songs directory: {SONGS_DIR}")
-    print(f"Sounds directory: {SOUNDS_DIR}")
-    print(f"Arduino Serial Port: {SERIAL_PORT} at {BAUD_RATE} baud")
-    print(f"Keybinds: {KEYBINDS}")
-    print("\nThis file can be run to test that the paths and settings are correct.")

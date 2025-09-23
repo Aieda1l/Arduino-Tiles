@@ -267,14 +267,14 @@ class GameScreen:
     def _process_tap(self, lane_idx, hit_time):
         hittable_tiles = [
             t for t in self.active_tiles if t.state in [TileState.ACTIVE, TileState.MISSED] and
-                                            abs(t.time - hit_time) < config.GOOD_TIMING and
                                             (t.lane == lane_idx or (isinstance(t.lane, tuple) and lane_idx in t.lane))
         ]
         if not hittable_tiles: return
+
         best_tile = min(hittable_tiles, key=lambda t: abs(t.time - hit_time))
         quality, color = best_tile.check_hit(hit_time)
 
-        if quality in ['perfect', 'great']:
+        if quality in ['perfect', 'great', 'good']:
             best_tile.on_hit(quality, color, hit_time)
 
             for i, track in enumerate(self.accompaniment_tracks):
@@ -284,14 +284,17 @@ class GameScreen:
                     if note_time > self.last_hit_musical_time:
                         self._play_sound(track[self.accompaniment_indices[i]]['note'])
                     self.accompaniment_indices[i] += 1
-
             self.last_hit_musical_time = best_tile.time
 
             for note in best_tile.notes: self._play_sound(note)
+
             if quality == 'perfect':
                 self.score += int(10 * self.combo)
             elif quality == 'great':
                 self.score += int(5 * self.combo)
+            elif quality == 'good':
+                self.score += int(2 * self.combo)  # Good hits are worth less but don't break combo
+
             self.combo = min(self.combo + 1, 999)
             lanes = [best_tile.lane] if isinstance(best_tile.lane, int) else best_tile.lane
             for ln in lanes: self._create_particles(ln)
