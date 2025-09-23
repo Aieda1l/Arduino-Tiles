@@ -50,9 +50,6 @@ def draw_text(surface, text, size, x, y, color, font_path, align="center", shado
 
 def draw_rounded_rect(surface, rect, color, corner_radius):
     """Draws a rectangle with rounded corners."""
-    if rect.width < 2 * corner_radius or rect.height < 2 * corner_radius:
-        raise ValueError("Rectangle is too small for the given corner radius.")
-
     # Draw the main body
     pygame.draw.rect(surface, color, rect.inflate(-2 * corner_radius, 0))
     pygame.draw.rect(surface, color, rect.inflate(0, -2 * corner_radius))

@@ -252,7 +252,7 @@ class GameScreen:
 
     def _handle_autoplay(self):
         for tile in self.active_tiles:
-            if tile.state == TileState.ACTIVE and tile.time <= self.game_time:
+            if tile.state in [TileState.ACTIVE, TileState.MISSED] and tile.time <= self.game_time:
                 lane_to_tap = tile.lane if isinstance(tile.lane, int) else tile.lane[0]
                 self._process_tap(lane_to_tap, tile.time)
 
@@ -262,7 +262,7 @@ class GameScreen:
 
     def _process_tap(self, lane_idx, hit_time):
         hittable_tiles = [
-            t for t in self.active_tiles if t.state == TileState.ACTIVE and
+            t for t in self.active_tiles if t.state in [TileState.ACTIVE, TileState.MISSED] and
                                             abs(t.time - hit_time) < config.GOOD_TIMING and
                                             (t.lane == lane_idx or (isinstance(t.lane, tuple) and lane_idx in t.lane))
         ]
@@ -292,7 +292,7 @@ class GameScreen:
             lanes = [best_tile.lane] if isinstance(best_tile.lane, int) else best_tile.lane
             for ln in lanes: self._create_particles(ln)
         else:
-            best_tile.miss()
+            best_tile.miss(hit_time)
             self.combo = 0
 
     def _update_tiles(self):
@@ -328,12 +328,12 @@ class GameScreen:
                 self.combo = 0
                 tile.pass_by()
 
-            if tile.state in [TileState.HIT, TileState.MISSED] and tile.fade_alpha <= 0:
+            if tile.state == TileState.HIT and tile.fade_alpha <= 0:
                 continue
 
             if tile.rect.top < self.surface.get_height() + 100:
                 remaining_tiles.append(tile)
-                if tile.state in [TileState.ACTIVE, TileState.HELD]:
+                if tile.state in [TileState.ACTIVE, TileState.HELD, TileState.MISSED]:
                     is_level_done = False
 
         self.active_tiles = remaining_tiles

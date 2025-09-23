@@ -72,6 +72,10 @@ class Tile:
         self.crazy_circle_anim_start_time = -1
         self.CRAZY_ANIM_DURATION = 0.15
 
+        # Flash properties for missed tiles
+        self.flash_start_time = -1
+        self.FLASH_DURATION = 0.3  # Duration of red flash in seconds
+
         if not hasattr(Tile, 'assets_loaded'):
             Tile.circle_light_img = utils.load_image(config.CIRCLE_LIGHT_IMG)
             Tile.crazy_circle_img = utils.load_image(config.CRAZY_CIRCLE_IMG)
@@ -92,8 +96,17 @@ class Tile:
             self.rect = pygame.Rect(lanes[0] * config.TILE_WIDTH, pos_y - height + (config.TILE_WIDTH / 2),
                                     config.TILE_WIDTH * (2 if self.sub_type == TileType.Dual else 1), height)
 
-        elif self.state in [TileState.HIT, TileState.MISSED]:
+        elif self.state == TileState.HIT:
             self.fade_alpha = max(0, self.fade_alpha - 15)
+
+        # Update flash for missed state
+        if self.state == TileState.MISSED:
+            if self.flash_start_time > 0:
+                flash_elapsed = current_time - self.flash_start_time
+                if flash_elapsed >= self.FLASH_DURATION:
+                    self.state = TileState.ACTIVE  # Revert to active after flash
+                    self.flash_start_time = -1
+                    self.hit_quality_color = None
 
         if self.crazy_circle_anim_start_time > 0:
             anim_elapsed = current_time - self.crazy_circle_anim_start_time
@@ -102,7 +115,7 @@ class Tile:
                 self.crazy_circle_anim_start_time = -1
 
     def draw(self, surface):
-        if self.state in [TileState.HIT, TileState.MISSED] and self.fade_alpha == 0:
+        if self.state == TileState.HIT and self.fade_alpha == 0:
             return
         lanes = [self.lane] if isinstance(self.lane, int) else self.lane
 
@@ -110,7 +123,8 @@ class Tile:
             draw_rect = self.rect.copy()
             draw_rect.x = lane * config.TILE_WIDTH
             color = config.BLACK
-            if self.state in [TileState.HIT, TileState.MISSED]: color = self.hit_quality_color
+            if self.state in [TileState.HIT, TileState.MISSED] and self.hit_quality_color:
+                color = self.hit_quality_color
 
             temp_surface = pygame.Surface(draw_rect.size, pygame.SRCALPHA)
 
@@ -207,11 +221,12 @@ class Tile:
             else:
                 self.state = TileState.HIT
         else:
-            self.miss()
+            self.miss(hit_time)
 
-    def miss(self):
+    def miss(self, hit_time):
         self.state = TileState.MISSED
         self.hit_quality_color = config.MISS_COLOR
+        self.flash_start_time = hit_time
 
     def pass_by(self):
         self.state = TileState.PASSED
@@ -275,7 +290,7 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT: running = False
             if event.type == pygame.KEYDOWN and event.key in config.KEYBINDS:
                 lane = config.KEYBINDS[event.key]
-                active_tiles = [t for t in tiles if t.state == TileState.ACTIVE and (
+                active_tiles = [t for t in tiles if t.state in [TileState.ACTIVE, TileState.MISSED] and (
                             t.lane == lane or (isinstance(t.lane, tuple) and lane in t.lane))]
                 if active_tiles:
                     best_tile = min(active_tiles, key=lambda t: abs(t.rect.bottom - config.STRIKE_LINE_Y))

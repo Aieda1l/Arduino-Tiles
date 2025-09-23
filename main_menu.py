@@ -27,6 +27,12 @@ class MainMenuScreen:
         self.max_scroll = 0
         self.selected_song = None
         self.preview_channel = None
+        self.sort_key = 'display_name'
+        self.sort_reverse = False
+        self.scrollbar_rect = pygame.Rect(config.SCREEN_WIDTH - 30, 150, 20, config.SCREEN_HEIGHT - 250)
+        self.scrollbar_handle_height = 50
+        self.scrollbar_dragging = False
+        self.scrollbar_handle_rect = pygame.Rect(0, 0, 0, 0)
         self.load_songs()
         self.buttons = []
         self.create_buttons()
@@ -50,9 +56,14 @@ class MainMenuScreen:
                     'difficulty_class': difficulty['class'],
                     'difficulty_color': difficulty['color']
                 })
-        self.songs.sort(key=lambda x: x['display_name'])
+        self.sort_songs()
         self.filtered_songs = self.songs.copy()
         self.update_max_scroll()
+
+    def sort_songs(self):
+        """Sort songs based on current sort key and direction."""
+        self.songs.sort(key=lambda x: x[self.sort_key], reverse=self.sort_reverse)
+        self.filter_songs()
 
     def calculate_song_difficulty(self, song_path):
         """Calculate song difficulty based on tile values and sequences."""
@@ -241,12 +252,50 @@ class MainMenuScreen:
             (20, config.SCREEN_HEIGHT - 80, 100, 50),
             "Back", lambda: {'action': 'back'}
         ))
+        # Sort by name button
+        self.buttons.append(utils.Button(
+            (50, 100, 100, 40),
+            "Sort: Name", lambda: self.toggle_sort('display_name')
+        ))
+        # Sort by difficulty button
+        self.buttons.append(utils.Button(
+            (160, 100, 120, 40),
+            "Sort: Difficulty", lambda: self.toggle_sort('difficulty')
+        ))
+
+    def toggle_sort(self, key):
+        """Toggle sorting by the specified key."""
+        if self.sort_key == key:
+            self.sort_reverse = not self.sort_reverse
+        else:
+            self.sort_key = key
+            self.sort_reverse = False
+        self.sort_songs()
 
     def update_max_scroll(self):
         """Calculate maximum scroll offset based on number of songs."""
         item_height = 60
         total_height = len(self.filtered_songs) * item_height
-        self.max_scroll = max(0, total_height - (config.SCREEN_HEIGHT - 200))
+        self.max_scroll = max(0, total_height - (config.SCREEN_HEIGHT - 250))
+        # Update scrollbar handle size
+        visible_height = config.SCREEN_HEIGHT - 250
+        if total_height > visible_height:
+            self.scrollbar_handle_height = max(30, (visible_height / total_height) * visible_height)
+        else:
+            self.scrollbar_handle_height = visible_height
+        self.update_scrollbar_handle()
+
+    def update_scrollbar_handle(self):
+        """Update the position and size of the scrollbar handle."""
+        if self.max_scroll > 0:
+            handle_y = self.scrollbar_rect.top + (self.scroll_offset / self.max_scroll) * (
+                self.scrollbar_rect.height - self.scrollbar_handle_height)
+        else:
+            handle_y = self.scrollbar_rect.top
+        self.scrollbar_handle_rect = pygame.Rect(
+            self.scrollbar_rect.left, handle_y,
+            self.scrollbar_rect.width, self.scrollbar_handle_height
+        )
 
     def handle_events(self):
         """Handle user input events."""
@@ -258,10 +307,26 @@ class MainMenuScreen:
                     for button in self.buttons:
                         button.handle_event(event)
                     self.handle_song_selection(event.pos)
+                    # Check if scrollbar handle is clicked
+                    if self.scrollbar_handle_rect.collidepoint(event.pos):
+                        self.scrollbar_dragging = True
                 elif event.button == 4:  # Scroll up
                     self.scroll_offset = max(0, self.scroll_offset - 20)
+                    self.update_scrollbar_handle()
                 elif event.button == 5:  # Scroll down
                     self.scroll_offset = min(self.max_scroll, self.scroll_offset + 20)
+                    self.update_scrollbar_handle()
+            if event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:  # Left click
+                    self.scrollbar_dragging = False
+            if event.type == pygame.MOUSEMOTION:
+                if self.scrollbar_dragging:
+                    mouse_y = event.pos[1]
+                    relative_y = mouse_y - self.scrollbar_rect.top
+                    scroll_ratio = relative_y / (self.scrollbar_rect.height - self.scrollbar_handle_height)
+                    self.scroll_offset = scroll_ratio * self.max_scroll
+                    self.scroll_offset = max(0, min(self.scroll_offset, self.max_scroll))
+                    self.update_scrollbar_handle()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return {'action': 'back'}
@@ -440,6 +505,11 @@ class MainMenuScreen:
                 self.surface, "▶", 20, play_button_rect.centerx, play_button_rect.centery,
                 config.WHITE, self.symbol_font_path, "center"
             )
+
+        # Draw scrollbar
+        if self.max_scroll > 0:
+            utils.draw_rounded_rect(self.surface, self.scrollbar_rect, (100, 100, 100), 5)
+            utils.draw_rounded_rect(self.surface, self.scrollbar_handle_rect, (150, 150, 150), 5)
 
         # Draw buttons
         for button in self.buttons:
