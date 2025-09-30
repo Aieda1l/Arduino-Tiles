@@ -8,7 +8,7 @@
 
 **Arduino Tiles** is a feature-complete clone of *Piano Tiles 2*, a rhythm-based game built using Python with Pygame for the front-end and Arduino for optional hardware input. Players can tap tiles in sync with music using a keyboard, mouse, or four IR proximity sensors connected to an Arduino. The game supports JSON-based song files, dynamic difficulty calculation, and a player-synced audio engine for an immersive experience.
 
-![Gameplay Demo](https://github.com/Aieda1l/Arduino-Tiles/blob/master/media/demo.mp4)
+<video src='https://github.com/Aieda1l/Arduino-Tiles/raw/refs/heads/master/media/demo.mp4'/>
 
 ## Table of Contents
 - [Features](#features)
