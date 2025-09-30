@@ -3,9 +3,12 @@
 ![Python](https://img.shields.io/badge/Python-3.13-blue?logo=python)
 ![Pygame](https://img.shields.io/badge/Pygame-2.5.5-orange?logo=pygame)
 ![Arduino](https://img.shields.io/badge/Arduino-1.8.19-red?logo=arduino)
-![License](https://img.shields.io/badge/License-MIT-green)
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC_BY--NC_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+[![made-with-love](https://img.shields.io/badge/Made%20with-❤️-red.svg)](https://shields.io/)
 
 **Arduino Tiles** is a feature-complete clone of *Piano Tiles 2*, a rhythm-based game built using Python with Pygame for the front-end and Arduino for optional hardware input. Players can tap tiles in sync with music using a keyboard, mouse, or four IR proximity sensors connected to an Arduino. The game supports JSON-based song files, dynamic difficulty calculation, and a player-synced audio engine for an immersive experience.
+
+![Gameplay Demo](https://github.com/Aieda1l/Arduino-Tiles/blob/main/media/demo.mp4)
 
 ## Table of Contents
 - [Features](#features)
