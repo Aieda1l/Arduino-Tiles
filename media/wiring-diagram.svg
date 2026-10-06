@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Arduino Tiles four-button wiring diagram</title>
+  <desc id="desc">Four normally-open momentary push buttons connect Arduino digital pins 2, 3, 4, and 5 to a shared ground. The sketch uses internal pull-up resistors.</desc>
+  <rect width="1200" height="700" fill="#ffffff"/>
+
+  <text x="600" y="52" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#111827">Arduino Tiles — 4-Button Wiring</text>
+  <text x="600" y="86" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#4b5563">Each normally-open button connects its input pin to GND when pressed (INPUT_PULLUP).</text>
+
+  <!-- Arduino board -->
+  <rect x="90" y="150" width="310" height="420" rx="28" fill="#e6f7f6" stroke="#0f766e" stroke-width="5"/>
+  <text x="245" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#0f766e">Arduino</text>
+  <text x="245" y="235" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#115e59">Uno or compatible</text>
+
+  <!-- Pin blocks -->
+  <g font-family="Arial, sans-serif" font-size="20" fill="#111827">
+    <circle cx="380" cy="295" r="9" fill="#0f766e"/><text x="330" y="302" text-anchor="end">D2</text>
+    <circle cx="380" cy="365" r="9" fill="#0f766e"/><text x="330" y="372" text-anchor="end">D3</text>
+    <circle cx="380" cy="435" r="9" fill="#0f766e"/><text x="330" y="442" text-anchor="end">D4</text>
+    <circle cx="380" cy="505" r="9" fill="#0f766e"/><text x="330" y="512" text-anchor="end">D5</text>
+    <circle cx="245" cy="550" r="9" fill="#111827"/><text x="205" y="557" text-anchor="end">GND</text>
+  </g>
+
+  <!-- Wires from inputs -->
+  <g stroke="#374151" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M380 295 H610"/>
+    <path d="M380 365 H610"/>
+    <path d="M380 435 H610"/>
+    <path d="M380 505 H610"/>
+  </g>
+
+  <!-- Buttons -->
+  <g font-family="Arial, sans-serif">
+    <!-- Lane 1 -->
+    <text x="745" y="267" text-anchor="middle" font-size="19" font-weight="700" fill="#111827">Lane 1</text>
+    <line x1="610" y1="295" x2="690" y2="295" stroke="#374151" stroke-width="5"/>
+    <circle cx="700" cy="295" r="7" fill="#111827"/>
+    <circle cx="790" cy="295" r="7" fill="#111827"/>
+    <line x1="707" y1="290" x2="772" y2="270" stroke="#111827" stroke-width="6" stroke-linecap="round"/>
+    <line x1="790" y1="295" x2="900" y2="295" stroke="#374151" stroke-width="5"/>
+
+    <!-- Lane 2 -->
+    <text x="745" y="337" text-anchor="middle" font-size="19" font-weight="700" fill="#111827">Lane 2</text>
+    <line x1="610" y1="365" x2="690" y2="365" stroke="#374151" stroke-width="5"/>
+    <circle cx="700" cy="365" r="7" fill="#111827"/>
+    <circle cx="790" cy="365" r="7" fill="#111827"/>
+    <line x1="707" y1="360" x2="772" y2="340" stroke="#111827" stroke-width="6" stroke-linecap="round"/>
+    <line x1="790" y1="365" x2="900" y2="365" stroke="#374151" stroke-width="5"/>
+
+    <!-- Lane 3 -->
+    <text x="745" y="407" text-anchor="middle" font-size="19" font-weight="700" fill="#111827">Lane 3</text>
+    <line x1="610" y1="435" x2="690" y2="435" stroke="#374151" stroke-width="5"/>
+    <circle cx="700" cy="435" r="7" fill="#111827"/>
+    <circle cx="790" cy="435" r="7" fill="#111827"/>
+    <line x1="707" y1="430" x2="772" y2="410" stroke="#111827" stroke-width="6" stroke-linecap="round"/>
+    <line x1="790" y1="435" x2="900" y2="435" stroke="#374151" stroke-width="5"/>
+
+    <!-- Lane 4 -->
+    <text x="745" y="477" text-anchor="middle" font-size="19" font-weight="700" fill="#111827">Lane 4</text>
+    <line x1="610" y1="505" x2="690" y2="505" stroke="#374151" stroke-width="5"/>
+    <circle cx="700" cy="505" r="7" fill="#111827"/>
+    <circle cx="790" cy="505" r="7" fill="#111827"/>
+    <line x1="707" y1="500" x2="772" y2="480" stroke="#111827" stroke-width="6" stroke-linecap="round"/>
+    <line x1="790" y1="505" x2="900" y2="505" stroke="#374151" stroke-width="5"/>
+  </g>
+
+  <!-- Common ground bus -->
+  <g stroke="#111827" stroke-width="5" fill="none" stroke-linecap="round">
+    <line x1="900" y1="295" x2="900" y2="550"/>
+    <line x1="245" y1="550" x2="900" y2="550"/>
+  </g>
+  <text x="930" y="430" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#111827">Common GND</text>
+
+  <!-- Notes -->
+  <rect x="90" y="615" width="1020" height="55" rx="12" fill="#f3f4f6"/>
+  <text x="600" y="649" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#374151">
+    No external pull-up resistors or 5V connection are required; the sketch enables Arduino's internal pull-ups.
+  </text>
+</svg>
